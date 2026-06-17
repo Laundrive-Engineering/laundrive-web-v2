@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { generateStaffId } from '@/utils/generators';
+import { generateStaffId, generateSecurePassword } from '@/utils/generators';
 
 interface StaffAccount {
   id: string;
@@ -45,7 +45,7 @@ export default function PartnerStaffPage() {
   const partnerCode = 'QC-001'; 
 
   const handleOpen = () => {
-    setFormData({ name: '', password: '' });
+    setFormData({ name: '', password: generateSecurePassword() });
     setOpen(true);
   };
 

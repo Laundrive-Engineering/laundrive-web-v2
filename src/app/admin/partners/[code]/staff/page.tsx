@@ -24,7 +24,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { generateStaffId } from '@/utils/generators';
+import { generateStaffId, generateSecurePassword } from '@/utils/generators';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -51,7 +51,7 @@ export default function AdminPartnerStaffPage() {
   });
 
   const handleOpen = () => {
-    setFormData({ name: '', password: '' });
+    setFormData({ name: '', password: generateSecurePassword() });
     setOpen(true);
   };
 

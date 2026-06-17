@@ -23,7 +23,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import BadgeIcon from '@mui/icons-material/Badge';
 import { generatePartnerCode } from '@/utils/generators';
+import { useRouter } from 'next/navigation';
 
 interface Partner {
   id: number;
@@ -43,6 +45,7 @@ export default function PartnersPage() {
   const [partners, setPartners] = React.useState<Partner[]>(initialPartners);
   const [open, setOpen] = React.useState(false);
   const [editingPartner, setEditingPartner] = React.useState<Partner | null>(null);
+  const router = useRouter();
   const [formData, setFormData] = React.useState({
     partnerCode: '',
     name: '',
@@ -131,6 +134,9 @@ export default function PartnersPage() {
                 <TableCell>{partner.phone}</TableCell>
                 <TableCell>{partner.location}</TableCell>
                 <TableCell align="right">
+                  <IconButton color="info" onClick={() => router.push(`/admin/partners/${partner.partnerCode}/staff?name=${encodeURIComponent(partner.name)}`)} title="Manage Staff">
+                    <BadgeIcon />
+                  </IconButton>
                   <IconButton color="primary" onClick={() => handleOpen(partner)}>
                     <EditIcon />
                   </IconButton>

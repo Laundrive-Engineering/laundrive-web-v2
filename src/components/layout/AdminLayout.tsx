@@ -45,22 +45,30 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
+  const [userRole, setUserRole] = React.useState<string | null>(null);
   const router = useRouter();
+
+  React.useEffect(() => {
+    setUserRole(localStorage.getItem('user-role'));
+  }, []);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('user-role');
     router.push('/login');
   };
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/admin' },
     { text: 'Partners', icon: <PeopleIcon />, href: '/admin/partners' },
-    { text: 'Users', icon: <PeopleIcon />, href: '/admin/users' },
-    { text: 'Settings', icon: <SettingsIcon />, href: '/admin/settings' },
+    { text: 'Users', icon: <PeopleIcon />, href: '/admin/users', superOnly: true },
+    { text: 'Settings', icon: <SettingsIcon />, href: '/admin/settings', superOnly: true },
   ];
+
+  const filteredMenuItems = menuItems.filter(item => !item.superOnly || userRole === 'super-admin');
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -76,7 +84,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Laundrive Admin
+            Laundrive {userRole === 'super-admin' ? 'Super Admin' : 'Admin'}
           </Typography>
           <IconButton color="inherit" onClick={handleLogout}>
             <LogoutIcon />
@@ -99,7 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {menuItems.map((item) => (
+            {filteredMenuItems.map((item) => (
               <ListItem key={item.text} disablePadding>
                 <ListItemButton component={Link} href={item.href}>
                   <ListItemIcon>{item.icon}</ListItemIcon>

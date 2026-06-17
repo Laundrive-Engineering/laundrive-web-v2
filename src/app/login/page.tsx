@@ -16,6 +16,10 @@ import {
   Tabs,
   Snackbar,
   Alert,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useRouter } from 'next/navigation';
@@ -44,6 +48,7 @@ function CustomTabPanel(props: TabPanelProps) {
 
 export default function LoginPage() {
   const [value, setValue] = React.useState(0);
+  const [adminRole, setAdminRole] = React.useState('super-admin');
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const router = useRouter();
@@ -65,8 +70,10 @@ export default function LoginPage() {
     event.preventDefault();
     // In a real app, you would handle authentication here
     if (value === 0) {
+      localStorage.setItem('user-role', adminRole);
       router.push('/admin');
     } else {
+      localStorage.setItem('user-role', 'partner');
       router.push('/partner');
     }
   };
@@ -111,6 +118,19 @@ export default function LoginPage() {
               <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
                 Access the administrative control panel.
               </Typography>
+              <FormControl fullWidth size="small" sx={{ mb: 1 }}>
+                <InputLabel id="admin-role-label">Admin Role</InputLabel>
+                <Select
+                  labelId="admin-role-label"
+                  id="admin-role"
+                  value={adminRole}
+                  label="Admin Role"
+                  onChange={(e) => setAdminRole(e.target.value)}
+                >
+                  <MenuItem value="super-admin">Super Admin</MenuItem>
+                  <MenuItem value="admin">Standard Admin</MenuItem>
+                </Select>
+              </FormControl>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
               <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
@@ -148,7 +168,7 @@ export default function LoginPage() {
               variant="contained"
               sx={{ mt: 3, mb: 2, py: 1.5 }}
             >
-              Sign In as {value === 0 ? 'Admin' : 'Partner'}
+              Sign In as {value === 0 ? (adminRole === 'super-admin' ? 'Super Admin' : 'Admin') : 'Partner'}
             </Button>
             <Grid container sx={{ justifyContent: 'flex-end' }}>
               <Grid>

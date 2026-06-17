@@ -18,6 +18,7 @@ import {
   DialogActions,
   TextField,
   Stack,
+  Chip,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -25,6 +26,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Partner {
   id: number;
+  partnerCode: string;
   name: string;
   email: string;
   phone: string;
@@ -32,8 +34,8 @@ interface Partner {
 }
 
 const initialPartners: Partner[] = [
-  { id: 1, name: 'Quick Clean', email: 'contact@quickclean.com', phone: '09123456789', location: 'Cebu City' },
-  { id: 2, name: 'Laundry Day', email: 'info@laundryday.ph', phone: '09987654321', location: 'Mandaue City' },
+  { id: 1, partnerCode: 'QC-001', name: 'Quick Clean', email: 'contact@quickclean.com', phone: '09123456789', location: 'Cebu City' },
+  { id: 2, partnerCode: 'LD-002', name: 'Laundry Day', email: 'info@laundryday.ph', phone: '09987654321', location: 'Mandaue City' },
 ];
 
 export default function PartnersPage() {
@@ -41,6 +43,7 @@ export default function PartnersPage() {
   const [open, setOpen] = React.useState(false);
   const [editingPartner, setEditingPartner] = React.useState<Partner | null>(null);
   const [formData, setFormData] = React.useState({
+    partnerCode: '',
     name: '',
     email: '',
     phone: '',
@@ -51,6 +54,7 @@ export default function PartnersPage() {
     if (partner) {
       setEditingPartner(partner);
       setFormData({
+        partnerCode: partner.partnerCode,
         name: partner.name,
         email: partner.email,
         phone: partner.phone,
@@ -58,7 +62,7 @@ export default function PartnersPage() {
       });
     } else {
       setEditingPartner(null);
-      setFormData({ name: '', email: '', phone: '', location: '' });
+      setFormData({ partnerCode: '', name: '', email: '', phone: '', location: '' });
     }
     setOpen(true);
   };
@@ -104,6 +108,7 @@ export default function PartnersPage() {
         <Table sx={{ minWidth: 650 }} aria-label="partners table">
           <TableHead>
             <TableRow>
+              <TableCell>Code</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Phone</TableCell>
@@ -114,6 +119,9 @@ export default function PartnersPage() {
           <TableBody>
             {partners.map((partner) => (
               <TableRow key={partner.id}>
+                <TableCell>
+                  <Chip label={partner.partnerCode} color="primary" variant="outlined" size="small" />
+                </TableCell>
                 <TableCell component="th" scope="row">
                   {partner.name}
                 </TableCell>
@@ -139,6 +147,15 @@ export default function PartnersPage() {
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
+              <TextField
+                name="partnerCode"
+                label="Partner Code"
+                fullWidth
+                required
+                value={formData.partnerCode}
+                onChange={handleChange}
+                helperText="Unique identifier for the partner"
+              />
               <TextField
                 name="name"
                 label="Partner Name"

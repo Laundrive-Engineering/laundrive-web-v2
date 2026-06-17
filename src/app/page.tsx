@@ -1,66 +1,63 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <Box
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+        color: 'white',
+        p: 3,
+      }}
+    >
+      <Typography variant="h1" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+        Laundrive
+      </Typography>
+      <Typography variant="h5" sx={{ mb: 4, maxWidth: 600 }}>
+        The complete laundry management platform for administrators and partners.
+      </Typography>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <Button
+          component={Link}
+          href="/admin"
+          variant="contained"
+          size="large"
+          sx={{
+            bgcolor: 'white',
+            color: 'primary.main',
+            '&:hover': { bgcolor: '#f5f5f5' },
+            px: 4,
+            py: 1.5,
+          }}
+        >
+          Admin Dashboard
+        </Button>
+        <Button
+          component={Link}
+          href="/partner"
+          variant="outlined"
+          size="large"
+          sx={{
+            borderColor: 'white',
+            color: 'white',
+            '&:hover': { borderColor: '#f5f5f5', bgcolor: 'rgba(255,255,255,0.1)' },
+            px: 4,
+            py: 1.5,
+          }}
+        >
+          Partner Dashboard
+        </Button>
+      </Stack>
+    </Box>
   );
 }

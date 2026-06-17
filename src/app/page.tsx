@@ -29,7 +29,7 @@ export default function Home() {
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
         <Button
           component={Link}
-          href="/admin"
+          href="/login"
           variant="contained"
           size="large"
           sx={{
@@ -40,11 +40,11 @@ export default function Home() {
             py: 1.5,
           }}
         >
-          Admin Dashboard
+          Get Started
         </Button>
         <Button
           component={Link}
-          href="/partner"
+          href="/login"
           variant="outlined"
           size="large"
           sx={{
@@ -55,7 +55,7 @@ export default function Home() {
             py: 1.5,
           }}
         >
-          Partner Dashboard
+          Login
         </Button>
       </Stack>
     </Box>

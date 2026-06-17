@@ -33,14 +33,15 @@ interface Partner {
   id: number;
   partnerCode: string;
   name: string;
+  contactPerson: string;
   email: string;
   phone: string;
   location: string;
 }
 
 const initialPartners: Partner[] = [
-  { id: 1, partnerCode: 'QC-001', name: 'Quick Clean', email: 'contact@quickclean.com', phone: '09123456789', location: 'Cebu City' },
-  { id: 2, partnerCode: 'LD-002', name: 'Laundry Day', email: 'info@laundryday.ph', phone: '09987654321', location: 'Mandaue City' },
+  { id: 1, partnerCode: 'QC-001', name: 'Quick Clean', contactPerson: 'John Doe', email: 'contact@quickclean.com', phone: '09123456789', location: 'Cebu City' },
+  { id: 2, partnerCode: 'LD-002', name: 'Laundry Day', contactPerson: 'Jane Smith', email: 'info@laundryday.ph', phone: '09987654321', location: 'Mandaue City' },
 ];
 
 export default function PartnersPage() {
@@ -53,6 +54,7 @@ export default function PartnersPage() {
   const [formData, setFormData] = React.useState({
     partnerCode: '',
     name: '',
+    contactPerson: '',
     email: '',
     phone: '',
     location: '',
@@ -64,13 +66,14 @@ export default function PartnersPage() {
       setFormData({
         partnerCode: partner.partnerCode,
         name: partner.name,
+        contactPerson: partner.contactPerson,
         email: partner.email,
         phone: partner.phone,
         location: partner.location,
       });
     } else {
       setEditingPartner(null);
-      setFormData({ partnerCode: '', name: '', email: '', phone: '', location: '' });
+      setFormData({ partnerCode: '', name: '', contactPerson: '', email: '', phone: '', location: '' });
     }
     setOpen(true);
   };
@@ -179,6 +182,14 @@ export default function PartnersPage() {
                 fullWidth
                 required
                 value={formData.name}
+                onChange={handleChange}
+              />
+              <TextField
+                name="contactPerson"
+                label="Contact Person"
+                fullWidth
+                required
+                value={formData.contactPerson}
                 onChange={handleChange}
               />
               <TextField

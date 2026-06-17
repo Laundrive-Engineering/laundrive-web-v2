@@ -99,7 +99,7 @@ export default function PartnerStaffPage() {
             {staff.map((s) => (
               <TableRow key={s.id}>
                 <TableCell>
-                  <Chip label={s.id} color="secondary" variant="outlined" size="small" />
+                  <Chip label={s.id} color="primary" variant="outlined" size="small" />
                 </TableCell>
                 <TableCell component="th" scope="row">
                   {s.name}
@@ -146,7 +146,7 @@ export default function PartnerStaffPage() {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit" variant="contained" color="secondary">
+            <Button type="submit" variant="contained" color="primary">
               Generate Account
             </Button>
           </DialogActions>

@@ -62,7 +62,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar position="fixed" color="secondary" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar position="fixed" color="primary" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <IconButton
             color="inherit"

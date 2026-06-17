@@ -14,6 +14,8 @@ import {
   Avatar,
   Tab,
   Tabs,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useRouter } from 'next/navigation';
@@ -42,10 +44,21 @@ function CustomTabPanel(props: TabPanelProps) {
 
 export default function LoginPage() {
   const [value, setValue] = React.useState(0);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const router = useRouter();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+    setOpenSnackbar(false);
+  };
+
+  const handleForgotPassword = (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (value === 1) {
+      setSnackbarMessage('Please contact Laundrive at support@laundrive.com');
+      setOpenSnackbar(true);
+    }
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -139,7 +152,7 @@ export default function LoginPage() {
             </Button>
             <Grid container>
               <Grid size="grow">
-                <Link href="#" variant="body2">
+                <Link href="#" variant="body2" onClick={handleForgotPassword}>
                   Forgot password?
                 </Link>
               </Grid>
@@ -151,6 +164,16 @@ export default function LoginPage() {
             </Grid>
           </Box>
         </Paper>
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={() => setOpenSnackbar(false)} severity="info" sx={{ width: '100%' }}>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
         <Typography variant="body2" color="white" align="center" sx={{ mt: 5 }}>
           {'Copyright © '}
           <Link color="inherit" href="/">

@@ -150,15 +150,10 @@ export default function LoginPage() {
             >
               Sign In as {value === 0 ? 'Admin' : 'Partner'}
             </Button>
-            <Grid container>
-              <Grid size="grow">
+            <Grid container sx={{ justifyContent: 'flex-end' }}>
+              <Grid>
                 <Link href="#" variant="body2" onClick={handleForgotPassword}>
                   Forgot password?
-                </Link>
-              </Grid>
-              <Grid>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
             </Grid>

@@ -49,6 +49,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/partner' },
     { text: 'Orders', icon: <ShoppingCartIcon />, href: '/partner/orders' },
+    { text: 'Staff', icon: <AccountCircleIcon />, href: '/partner/staff' },
     { text: 'Profile', icon: <AccountCircleIcon />, href: '/partner/profile' },
   ];
 

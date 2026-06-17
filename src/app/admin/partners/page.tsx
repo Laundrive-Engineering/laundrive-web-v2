@@ -23,6 +23,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { generatePartnerCode } from '@/utils/generators';
 
 interface Partner {
   id: number;
@@ -83,6 +84,7 @@ export default function PartnersPage() {
       const newPartner = {
         id: partners.length + 1,
         ...formData,
+        partnerCode: formData.partnerCode || generatePartnerCode(formData.name),
       };
       setPartners([...partners, newPartner]);
     }
@@ -151,10 +153,11 @@ export default function PartnersPage() {
                 name="partnerCode"
                 label="Partner Code"
                 fullWidth
-                required
                 value={formData.partnerCode}
                 onChange={handleChange}
-                helperText="Unique identifier for the partner"
+                disabled={!!editingPartner}
+                placeholder="Leave blank to auto-generate"
+                helperText={editingPartner ? "Partner code cannot be changed" : "Unique identifier for the partner (auto-generated if blank)"}
               />
               <TextField
                 name="name"

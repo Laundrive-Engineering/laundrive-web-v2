@@ -36,26 +36,13 @@ export default function Home() {
             bgcolor: 'white',
             color: 'primary.main',
             '&:hover': { bgcolor: '#f5f5f5' },
-            px: 4,
-            py: 1.5,
+            px: 6,
+            py: 2,
+            fontSize: '1.1rem',
+            fontWeight: 'bold',
           }}
         >
           Get Started
-        </Button>
-        <Button
-          component={Link}
-          href="/login"
-          variant="outlined"
-          size="large"
-          sx={{
-            borderColor: 'white',
-            color: 'white',
-            '&:hover': { borderColor: '#f5f5f5', bgcolor: 'rgba(255,255,255,0.1)' },
-            px: 4,
-            py: 1.5,
-          }}
-        >
-          Login
         </Button>
       </Stack>
     </Box>

@@ -42,10 +42,17 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
-const ACCOUNTS = [
+interface Account {
+  email?: string;
+  username?: string;
+  password: string;
+  role: string;
+  type: number;
+}
+
+const ACCOUNTS: Account[] = [
   { email: 'superadmin@laundrive.com', password: 'Laundrive@Super2026!Admin', role: 'super-admin', type: 0 },
   { email: 'admin@laundrive.com', password: 'Laundrive#Admin2026%Secure', role: 'admin', type: 0 },
-  { username: 'PARTNER001', password: 'Partner*Laundrive2026$Safe', role: 'partner', type: 1 },
 ];
 
 export default function LoginPage() {

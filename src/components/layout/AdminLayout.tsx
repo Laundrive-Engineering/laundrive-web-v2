@@ -18,7 +18,9 @@ import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const drawerWidth = 240;
 
@@ -43,9 +45,14 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
+  const router = useRouter();
 
   const handleDrawerToggle = () => {
     setOpen(!open);
+  };
+
+  const handleLogout = () => {
+    router.push('/login');
   };
 
   const menuItems = [
@@ -68,9 +75,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Laundrive Admin
           </Typography>
+          <IconButton color="inherit" onClick={handleLogout}>
+            <LogoutIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer

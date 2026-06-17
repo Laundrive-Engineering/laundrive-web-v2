@@ -16,7 +16,9 @@ import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const drawerWidth = 240;
 
@@ -41,9 +43,14 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 
 export default function PartnerLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
+  const router = useRouter();
 
   const handleDrawerToggle = () => {
     setOpen(!open);
+  };
+
+  const handleLogout = () => {
+    router.push('/login');
   };
 
   const menuItems = [
@@ -66,9 +73,12 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Laundrive Partner
           </Typography>
+          <IconButton color="inherit" onClick={handleLogout}>
+            <LogoutIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer

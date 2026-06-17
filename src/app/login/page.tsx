@@ -16,10 +16,6 @@ import {
   Tabs,
   Snackbar,
   Alert,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useRouter } from 'next/navigation';
@@ -46,11 +42,17 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
+const ACCOUNTS = [
+  { email: 'superadmin@laundrive.com', password: 'superpassword', role: 'super-admin', type: 0 },
+  { email: 'admin@laundrive.com', password: 'adminpassword', role: 'admin', type: 0 },
+  { email: 'partner@laundrive.com', password: 'partnerpassword', role: 'partner', type: 1 },
+];
+
 export default function LoginPage() {
   const [value, setValue] = React.useState(0);
-  const [adminRole, setAdminRole] = React.useState('super-admin');
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState<'info' | 'error'>('info');
   const router = useRouter();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -61,6 +63,7 @@ export default function LoginPage() {
   const handleForgotPassword = (event: React.MouseEvent) => {
     event.preventDefault();
     if (value === 1) {
+      setSnackbarSeverity('info');
       setSnackbarMessage('Please contact Laundrive at support@laundrive.com');
       setOpenSnackbar(true);
     }
@@ -68,13 +71,25 @@ export default function LoginPage() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // In a real app, you would handle authentication here
-    if (value === 0) {
-      localStorage.setItem('user-role', adminRole);
-      router.push('/admin');
+    const data = new FormData(event.currentTarget);
+    const email = data.get('email');
+    const password = data.get('password');
+
+    const account = ACCOUNTS.find(
+      (acc) => acc.email === email && acc.password === password && acc.type === value
+    );
+
+    if (account) {
+      localStorage.setItem('user-role', account.role);
+      if (account.type === 0) {
+        router.push('/admin');
+      } else {
+        router.push('/partner');
+      }
     } else {
-      localStorage.setItem('user-role', 'partner');
-      router.push('/partner');
+      setSnackbarSeverity('error');
+      setSnackbarMessage('Invalid email or password for this account type.');
+      setOpenSnackbar(true);
     }
   };
 
@@ -118,19 +133,6 @@ export default function LoginPage() {
               <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
                 Access the administrative control panel.
               </Typography>
-              <FormControl fullWidth size="small" sx={{ mb: 1 }}>
-                <InputLabel id="admin-role-label">Admin Role</InputLabel>
-                <Select
-                  labelId="admin-role-label"
-                  id="admin-role"
-                  value={adminRole}
-                  label="Admin Role"
-                  onChange={(e) => setAdminRole(e.target.value)}
-                >
-                  <MenuItem value="super-admin">Super Admin</MenuItem>
-                  <MenuItem value="admin">Standard Admin</MenuItem>
-                </Select>
-              </FormControl>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
               <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
@@ -168,7 +170,7 @@ export default function LoginPage() {
               variant="contained"
               sx={{ mt: 3, mb: 2, py: 1.5 }}
             >
-              Sign In as {value === 0 ? (adminRole === 'super-admin' ? 'Super Admin' : 'Admin') : 'Partner'}
+              Sign In
             </Button>
             <Grid container sx={{ justifyContent: 'flex-end' }}>
               <Grid>
@@ -185,7 +187,7 @@ export default function LoginPage() {
           onClose={() => setOpenSnackbar(false)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          <Alert onClose={() => setOpenSnackbar(false)} severity="info" sx={{ width: '100%' }}>
+          <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
             {snackbarMessage}
           </Alert>
         </Snackbar>

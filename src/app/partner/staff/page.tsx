@@ -19,9 +19,12 @@ import {
   TextField,
   Stack,
   Chip,
+  InputAdornment,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { generateStaffId, generateSecurePassword } from '@/utils/generators';
 
 interface StaffAccount {
@@ -36,6 +39,7 @@ export default function PartnerStaffPage() {
     { id: 'STF-QC-001-123', name: 'John Doe', role: 'Washer', createdAt: '2024-06-17' },
   ]);
   const [open, setOpen] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(true);
   const [formData, setFormData] = React.useState({
     name: '',
     password: '',
@@ -46,6 +50,7 @@ export default function PartnerStaffPage() {
 
   const handleOpen = () => {
     setFormData({ name: '', password: generateSecurePassword() });
+    setShowPassword(true);
     setOpen(true);
   };
 
@@ -136,11 +141,26 @@ export default function PartnerStaffPage() {
               <TextField
                 name="password"
                 label="Initial Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 fullWidth
                 required
                 value={formData.password}
                 onChange={handleChange}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
             </Stack>
           </DialogContent>

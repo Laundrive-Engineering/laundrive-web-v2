@@ -21,9 +21,12 @@ import {
   Chip,
   Breadcrumbs,
   Link as MuiLink,
+  InputAdornment,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { generateStaffId, generateSecurePassword } from '@/utils/generators';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -45,6 +48,7 @@ export default function AdminPartnerStaffPage() {
     { id: `STF-${partnerCode}-123`, name: 'Sample Staff', role: 'Staff', createdAt: '2024-06-17' },
   ]);
   const [open, setOpen] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(true);
   const [formData, setFormData] = React.useState({
     name: '',
     password: '',
@@ -52,6 +56,7 @@ export default function AdminPartnerStaffPage() {
 
   const handleOpen = () => {
     setFormData({ name: '', password: generateSecurePassword() });
+    setShowPassword(true);
     setOpen(true);
   };
 
@@ -154,11 +159,26 @@ export default function AdminPartnerStaffPage() {
               <TextField
                 name="password"
                 label="Initial Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 fullWidth
                 required
                 value={formData.password}
                 onChange={handleChange}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
             </Stack>
           </DialogContent>

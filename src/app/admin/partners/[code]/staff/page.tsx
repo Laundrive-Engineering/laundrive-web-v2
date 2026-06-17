@@ -21,6 +21,8 @@ import {
   Chip,
   Breadcrumbs,
   Link as MuiLink,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -45,6 +47,8 @@ export default function AdminPartnerStaffPage() {
     { id: `STF-${partnerCode}-123`, name: 'Sample Staff', role: 'Staff', createdAt: '2024-06-17' },
   ]);
   const [open, setOpen] = React.useState(false);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [credentialMessage, setCredentialMessage] = React.useState('');
   const [formData, setFormData] = React.useState({
     name: '',
     password: '',
@@ -65,13 +69,18 @@ export default function AdminPartnerStaffPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const staffId = generateStaffId(partnerCode);
+    const defaultPassword = formData.password || `Staff@${staffId}!`;
+
     const newStaff = {
-      id: generateStaffId(partnerCode),
+      id: staffId,
       name: formData.name,
       role: 'Staff',
       createdAt: new Date().toISOString().split('T')[0],
     };
     setStaff([...staff, newStaff]);
+    setCredentialMessage(`Staff account created! ID: ${staffId}, Password: ${defaultPassword}`);
+    setOpenSnackbar(true);
     handleClose();
   };
 
@@ -98,7 +107,7 @@ export default function AdminPartnerStaffPage() {
           </Typography>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpen}>
-          Add Staff Account
+          Add {partnerName} Staff
         </Button>
       </Stack>
 
@@ -136,12 +145,12 @@ export default function AdminPartnerStaffPage() {
       </TableContainer>
 
       <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
-        <DialogTitle>Generate Staff Account</DialogTitle>
+        <DialogTitle>Add {partnerName} Staff</DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                Generating staff account for <strong>{partnerName}</strong>.
+                Add a new staff member for <strong>{partnerName}</strong>. A secure password will be generated if left blank.
               </Typography>
               <TextField
                 name="name"
@@ -156,20 +165,31 @@ export default function AdminPartnerStaffPage() {
                 label="Initial Password"
                 type="password"
                 fullWidth
-                required
                 value={formData.password}
                 onChange={handleChange}
+                placeholder="Leave blank to auto-generate"
               />
             </Stack>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
             <Button type="submit" variant="contained">
-              Generate Account
+              Add Staff
             </Button>
           </DialogActions>
         </form>
       </Dialog>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={10000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+          {credentialMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

@@ -45,7 +45,7 @@ function CustomTabPanel(props: TabPanelProps) {
 const ACCOUNTS = [
   { email: 'superadmin@laundrive.com', password: 'Laundrive@Super2026!Admin', role: 'super-admin', type: 0 },
   { email: 'admin@laundrive.com', password: 'Laundrive#Admin2026%Secure', role: 'admin', type: 0 },
-  { email: 'partner@laundrive.com', password: 'Partner*Laundrive2026$Safe', role: 'partner', type: 1 },
+  { username: 'PARTNER001', password: 'Partner*Laundrive2026$Safe', role: 'partner', type: 1 },
 ];
 
 export default function LoginPage() {
@@ -72,11 +72,14 @@ export default function LoginPage() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const email = data.get('email');
+    const identifier = data.get('identifier');
     const password = data.get('password');
 
     const account = ACCOUNTS.find(
-      (acc) => acc.email === email && acc.password === password && acc.type === value
+      (acc) => 
+        (value === 0 ? acc.email === identifier : acc.username === identifier) && 
+        acc.password === password && 
+        acc.type === value
     );
 
     if (account) {
@@ -144,10 +147,10 @@ export default function LoginPage() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="identifier"
+              label={value === 0 ? "Email Address" : "Username"}
+              name="identifier"
+              autoComplete={value === 0 ? "email" : "username"}
               autoFocus
             />
             <TextField

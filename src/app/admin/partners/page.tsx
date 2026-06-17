@@ -19,6 +19,8 @@ import {
   TextField,
   Stack,
   Chip,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -45,6 +47,8 @@ export default function PartnersPage() {
   const [partners, setPartners] = React.useState<Partner[]>(initialPartners);
   const [open, setOpen] = React.useState(false);
   const [editingPartner, setEditingPartner] = React.useState<Partner | null>(null);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [credentialMessage, setCredentialMessage] = React.useState('');
   const router = useRouter();
   const [formData, setFormData] = React.useState({
     partnerCode: '',
@@ -84,12 +88,16 @@ export default function PartnersPage() {
     if (editingPartner) {
       setPartners(partners.map(p => p.id === editingPartner.id ? { ...editingPartner, ...formData } : p));
     } else {
+      const partnerCode = formData.partnerCode || generatePartnerCode(formData.name);
+      const defaultPassword = `Laundrive@${partnerCode}!`;
       const newPartner = {
         id: partners.length + 1,
         ...formData,
-        partnerCode: formData.partnerCode || generatePartnerCode(formData.name),
+        partnerCode,
       };
       setPartners([...partners, newPartner]);
+      setCredentialMessage(`Partner added! Username: ${partnerCode}, Password: ${defaultPassword}`);
+      setOpenSnackbar(true);
     }
     handleClose();
   };
@@ -208,6 +216,17 @@ export default function PartnersPage() {
           </DialogActions>
         </form>
       </Dialog>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={10000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+          {credentialMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

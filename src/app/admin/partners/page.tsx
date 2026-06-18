@@ -321,7 +321,8 @@ export default function PartnersPage() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Done</Button>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose} variant="contained">Done</Button>
         </DialogActions>
       </Dialog>
 

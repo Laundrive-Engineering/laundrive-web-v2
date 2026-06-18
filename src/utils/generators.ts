@@ -17,16 +17,22 @@ export const generateStaffId = (partnerCode: string): string => {
 };
 
 export const generateSecurePassword = (length = 12): string => {
-  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-  let retVal = "";
-  // Ensure at least one of each required type
-  retVal += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
-  retVal += "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)];
-  retVal += "0123456789"[Math.floor(Math.random() * 10)];
-  retVal += "!@#$%^&*()_+"[Math.floor(Math.random() * 12)];
+  const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const lowercase = "abcdefghijklmnopqrstuvwxyz";
+  const numbers = "0123456789";
+  const charset = uppercase + lowercase + numbers;
   
-  for (let i = 0; i < length - 4; ++i) {
+  let retVal = "";
+  // Ensure at least one of each required type for security standards
+  retVal += uppercase[Math.floor(Math.random() * uppercase.length)];
+  retVal += lowercase[Math.floor(Math.random() * lowercase.length)];
+  retVal += numbers[Math.floor(Math.random() * numbers.length)];
+  
+  // Fill the rest of the length
+  for (let i = 0; i < length - 3; ++i) {
     retVal += charset.charAt(Math.floor(Math.random() * charset.length));
   }
+  
+  // Shuffle the string
   return retVal.split('').sort(() => 0.5 - Math.random()).join('');
 };

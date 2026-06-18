@@ -22,6 +22,10 @@ import {
   Breadcrumbs,
   Link as MuiLink,
   InputAdornment,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,6 +38,8 @@ import Link from 'next/link';
 interface StaffAccount {
   id: string;
   name: string;
+  email: string;
+  phone: string;
   role: string;
   createdAt: string;
 }
@@ -45,17 +51,20 @@ export default function AdminPartnerStaffPage() {
   const partnerName = searchParams.get('name') || 'Partner';
 
   const [staff, setStaff] = React.useState<StaffAccount[]>([
-    { id: `STF-${partnerCode}-123`, name: 'Sample Staff', role: 'Staff', createdAt: '2024-06-17' },
+    { id: `STF-${partnerCode}-123`, name: 'Sample Staff', email: 'staff@example.com', phone: '0922222222', role: 'Staff', createdAt: '2024-06-17' },
   ]);
   const [open, setOpen] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(true);
   const [formData, setFormData] = React.useState({
     name: '',
+    email: '',
+    phone: '',
+    role: 'Staff',
     password: '',
   });
 
   const handleOpen = () => {
-    setFormData({ name: '', password: generateSecurePassword() });
+    setFormData({ name: '', email: '', phone: '', role: 'Staff', password: generateSecurePassword() });
     setShowPassword(true);
     setOpen(true);
   };
@@ -70,10 +79,13 @@ export default function AdminPartnerStaffPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const staffId = generateStaffId(partnerCode);
     const newStaff = {
-      id: generateStaffId(partnerCode),
+      id: staffId,
       name: formData.name,
-      role: 'Staff',
+      email: formData.email,
+      phone: formData.phone,
+      role: formData.role,
       createdAt: new Date().toISOString().split('T')[0],
     };
     setStaff([...staff, newStaff]);
@@ -103,7 +115,7 @@ export default function AdminPartnerStaffPage() {
           </Typography>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpen}>
-          Add Staff Account
+          Add {partnerName} Staff
         </Button>
       </Stack>
 
@@ -111,8 +123,9 @@ export default function AdminPartnerStaffPage() {
         <Table sx={{ minWidth: 650 }} aria-label="staff table">
           <TableHead>
             <TableRow>
-              <TableCell>Staff ID / Code</TableCell>
+              <TableCell>Staff ID</TableCell>
               <TableCell>Name</TableCell>
+              <TableCell>Contact</TableCell>
               <TableCell>Role</TableCell>
               <TableCell>Created At</TableCell>
               <TableCell align="right">Actions</TableCell>
@@ -127,6 +140,10 @@ export default function AdminPartnerStaffPage() {
                 <TableCell component="th" scope="row">
                   {s.name}
                 </TableCell>
+                <TableCell>
+                  <Typography variant="body2">{s.email}</Typography>
+                  <Typography variant="caption" color="text.secondary">{s.phone}</Typography>
+                </TableCell>
                 <TableCell>{s.role}</TableCell>
                 <TableCell>{s.createdAt}</TableCell>
                 <TableCell align="right">
@@ -140,22 +157,56 @@ export default function AdminPartnerStaffPage() {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Generate Staff Account</DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                Generating staff account for <strong>{partnerName}</strong>.
+                Register a new staff member for <strong>{partnerName}</strong>. This account will be tied to this partner.
               </Typography>
               <TextField
                 name="name"
-                label="Staff Name"
+                label="Full Name"
                 fullWidth
                 required
                 value={formData.name}
                 onChange={handleChange}
               />
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  name="email"
+                  label="Email Address"
+                  type="email"
+                  fullWidth
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                <TextField
+                  name="phone"
+                  label="Phone Number"
+                  fullWidth
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </Stack>
+              <FormControl fullWidth>
+                <InputLabel id="role-label">Role</InputLabel>
+                <Select
+                  labelId="role-label"
+                  name="role"
+                  value={formData.role}
+                  label="Role"
+                  onChange={(e: any) => setFormData({ ...formData, role: e.target.value })}
+                >
+                  <MenuItem value="Staff">Staff</MenuItem>
+                  <MenuItem value="Washer">Washer</MenuItem>
+                  <MenuItem value="Delivery">Delivery</MenuItem>
+                  <MenuItem value="Manager">Manager</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 name="password"
                 label="Initial Password"

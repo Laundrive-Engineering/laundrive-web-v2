@@ -1,10 +1,12 @@
 export const generatePartnerCode = (name: string): string => {
   const prefix = name
-    .split(' ')
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 3);
+    ? name
+        .split(' ')
+        .map((word) => word[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 3)
+    : 'PRT';
   const random = Math.floor(1000 + Math.random() * 9000);
   return `${prefix}-${random}`;
 };

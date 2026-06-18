@@ -21,12 +21,16 @@ import {
   Chip,
   Snackbar,
   Alert,
+  InputAdornment,
+  Divider,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BadgeIcon from '@mui/icons-material/Badge';
-import { generatePartnerCode } from '@/utils/generators';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { generatePartnerCode, generateSecurePassword } from '@/utils/generators';
 import { useRouter } from 'next/navigation';
 
 interface Partner {
@@ -48,8 +52,9 @@ export default function PartnersPage() {
   const [partners, setPartners] = React.useState<Partner[]>(initialPartners);
   const [open, setOpen] = React.useState(false);
   const [editingPartner, setEditingPartner] = React.useState<Partner | null>(null);
+  const [showPassword, setShowPassword] = React.useState(true);
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
-  const [credentialMessage, setCredentialMessage] = React.useState('');
+  const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const router = useRouter();
   const [formData, setFormData] = React.useState({
     partnerCode: '',
@@ -58,6 +63,7 @@ export default function PartnersPage() {
     email: '',
     phone: '',
     location: '',
+    password: '',
   });
 
   const handleOpen = (partner?: Partner) => {
@@ -70,10 +76,21 @@ export default function PartnersPage() {
         email: partner.email,
         phone: partner.phone,
         location: partner.location,
+        password: '••••••••',
       });
+      setShowPassword(false);
     } else {
       setEditingPartner(null);
-      setFormData({ partnerCode: '', name: '', contactPerson: '', email: '', phone: '', location: '' });
+      setFormData({
+        partnerCode: generatePartnerCode(''),
+        name: '',
+        contactPerson: '',
+        email: '',
+        phone: '',
+        location: '',
+        password: generateSecurePassword(),
+      });
+      setShowPassword(true);
     }
     setOpen(true);
   };
@@ -90,18 +107,16 @@ export default function PartnersPage() {
     e.preventDefault();
     if (editingPartner) {
       setPartners(partners.map(p => p.id === editingPartner.id ? { ...editingPartner, ...formData } : p));
+      setSnackbarMessage('Partner updated successfully');
     } else {
-      const partnerCode = formData.partnerCode || generatePartnerCode(formData.name);
-      const defaultPassword = `Laundrive@${partnerCode}!`;
       const newPartner = {
         id: partners.length + 1,
         ...formData,
-        partnerCode,
       };
       setPartners([...partners, newPartner]);
-      setCredentialMessage(`Partner added! Username: ${partnerCode}, Password: ${defaultPassword}`);
-      setOpenSnackbar(true);
+      setSnackbarMessage(`Partner ${formData.partnerCode} added successfully`);
     }
+    setOpenSnackbar(true);
     handleClose();
   };
 
@@ -166,16 +181,47 @@ export default function PartnersPage() {
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
-              <TextField
-                name="partnerCode"
-                label="Partner Code"
-                fullWidth
-                value={formData.partnerCode}
-                onChange={handleChange}
-                disabled={!!editingPartner}
-                placeholder="Leave blank to auto-generate"
-                helperText={editingPartner ? "Partner code cannot be changed" : "Unique identifier for the partner (auto-generated if blank)"}
-              />
+              <Typography variant="subtitle2" color="primary">Account Credentials</Typography>
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  name="partnerCode"
+                  label="Generated Username"
+                  fullWidth
+                  value={formData.partnerCode}
+                  slotProps={{
+                    input: { readOnly: true },
+                  }}
+                  helperText="Unique login identifier"
+                />
+                <TextField
+                  name="password"
+                  label="Initial Password"
+                  fullWidth
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange}
+                  disabled={!!editingPartner}
+                  slotProps={{
+                    input: {
+                      readOnly: !!editingPartner,
+                      endAdornment: !editingPartner && (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                  helperText={editingPartner ? "Password cannot be viewed here" : "Secure auto-generated password"}
+                />
+              </Stack>
+              <Divider sx={{ my: 1 }} />
+              <Typography variant="subtitle2" color="primary">Partner Details</Typography>
               <TextField
                 name="name"
                 label="Partner Name"
@@ -230,12 +276,12 @@ export default function PartnersPage() {
 
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={10000}
+        autoHideDuration={6000}
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
-          {credentialMessage}
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </Box>

@@ -28,6 +28,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BadgeIcon from '@mui/icons-material/Badge';
+import LockResetIcon from '@mui/icons-material/LockReset';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { generatePartnerCode, generateSecurePassword } from '@/utils/generators';
@@ -51,6 +52,9 @@ const initialPartners: Partner[] = [
 export default function PartnersPage() {
   const [partners, setPartners] = React.useState<Partner[]>(initialPartners);
   const [open, setOpen] = React.useState(false);
+  const [resetDialogOpen, setResetDialogOpen] = React.useState(false);
+  const [resettingPartner, setResettingPartner] = React.useState<Partner | null>(null);
+  const [newPassword, setNewPassword] = React.useState('');
   const [editingPartner, setEditingPartner] = React.useState<Partner | null>(null);
   const [showPassword, setShowPassword] = React.useState(true);
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
@@ -95,8 +99,17 @@ export default function PartnersPage() {
     setOpen(true);
   };
 
+  const handleResetPassword = (partner: Partner) => {
+    const password = generateSecurePassword();
+    setResettingPartner(partner);
+    setNewPassword(password);
+    setShowPassword(true);
+    setResetDialogOpen(true);
+  };
+
   const handleClose = () => {
     setOpen(false);
+    setResetDialogOpen(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,6 +173,9 @@ export default function PartnersPage() {
                 <TableCell>{partner.phone}</TableCell>
                 <TableCell>{partner.location}</TableCell>
                 <TableCell align="right">
+                  <IconButton color="warning" onClick={() => handleResetPassword(partner)} title="Reset Password">
+                    <LockResetIcon />
+                  </IconButton>
                   <IconButton color="info" onClick={() => router.push(`/admin/partners/${partner.partnerCode}/staff?name=${encodeURIComponent(partner.name)}`)} title="Manage Staff">
                     <BadgeIcon />
                   </IconButton>
@@ -272,6 +288,41 @@ export default function PartnersPage() {
             </Button>
           </DialogActions>
         </form>
+      </Dialog>
+
+      <Dialog open={resetDialogOpen} onClose={handleClose} maxWidth="xs" fullWidth>
+        <DialogTitle>Reset Partner Password</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            A new secure password has been generated for <strong>{resettingPartner?.name}</strong>.
+          </Typography>
+          <TextField
+            label="New Secure Password"
+            fullWidth
+            value={newPassword}
+            type={showPassword ? 'text' : 'password'}
+            slotProps={{
+              input: {
+                readOnly: true,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+            helperText="Please share this new password with the partner."
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Done</Button>
+        </DialogActions>
       </Dialog>
 
       <Snackbar

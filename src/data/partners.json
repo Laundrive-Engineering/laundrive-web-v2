@@ -1,0 +1,4 @@
+[
+  { "id": 1, "partnerCode": "QC-001", "name": "Quick Clean", "contactPerson": "John Doe", "email": "contact@quickclean.com", "phone": "09123456789", "location": "Cebu City", "password": "password123" },
+  { "id": 2, "partnerCode": "LD-002", "name": "Laundry Day", "contactPerson": "Jane Smith", "email": "info@laundryday.ph", "phone": "09987654321", "location": "Mandaue City", "password": "password123" }
+]

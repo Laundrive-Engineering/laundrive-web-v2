@@ -76,29 +76,51 @@ export default function LoginPage() {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const identifier = data.get('identifier');
     const password = data.get('password');
 
-    const account = ACCOUNTS.find(
-      (acc) => 
-        (value === 0 ? acc.email === identifier : acc.username === identifier) && 
-        acc.password === password && 
-        acc.type === value
-    );
-
-    if (account) {
-      localStorage.setItem('user-role', account.role);
-      if (account.type === 0) {
-        router.push('/admin');
-      } else {
-        router.push('/partner');
-      }
-    } else {
+    if (!identifier || !password) {
       setSnackbarSeverity('error');
-      setSnackbarMessage('Invalid email or password for this account type.');
+      setSnackbarMessage('Please fill in all fields.');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identifier,
+          password,
+          type: value,
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        localStorage.setItem('user-role', json.role);
+        if (json.type === 1) {
+          localStorage.setItem('partner-code', json.partnerCode || '');
+          localStorage.setItem('partner-name', json.name || '');
+        }
+        
+        if (json.type === 0) {
+          router.push('/admin');
+        } else {
+          router.push('/partner');
+        }
+      } else {
+        setSnackbarSeverity('error');
+        setSnackbarMessage(json.error || 'Invalid email or password for this account type.');
+        setOpenSnackbar(true);
+      }
+    } catch (err) {
+      setSnackbarSeverity('error');
+      setSnackbarMessage('An error occurred during authentication.');
       setOpenSnackbar(true);
     }
   };

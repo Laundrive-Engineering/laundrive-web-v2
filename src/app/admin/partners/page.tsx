@@ -23,6 +23,7 @@ import {
   Alert,
   InputAdornment,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -45,22 +46,23 @@ interface Partner {
   location: string;
 }
 
-const initialPartners: Partner[] = [
-  { id: 1, partnerCode: 'QC-001', name: 'Quick Clean', contactPerson: 'John Doe', email: 'contact@quickclean.com', phone: '09123456789', location: 'Cebu City' },
-  { id: 2, partnerCode: 'LD-002', name: 'Laundry Day', contactPerson: 'Jane Smith', email: 'info@laundryday.ph', phone: '09987654321', location: 'Mandaue City' },
-];
-
 export default function PartnersPage() {
-  const [partners, setPartners] = React.useState<Partner[]>(initialPartners);
+  const [partners, setPartners] = React.useState<Partner[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [open, setOpen] = React.useState(false);
   const [resetDialogOpen, setResetDialogOpen] = React.useState(false);
   const [resettingPartner, setResettingPartner] = React.useState<Partner | null>(null);
   const [newPassword, setNewPassword] = React.useState('');
   const [editingPartner, setEditingPartner] = React.useState<Partner | null>(null);
   const [showPassword, setShowPassword] = React.useState(true);
+  const [submitting, setSubmitting] = React.useState(false);
+
+  // Snackbar feedback state
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
   const router = useRouter();
+
   const [formData, setFormData] = React.useState({
     partnerCode: '',
     name: '',
@@ -70,6 +72,33 @@ export default function PartnersPage() {
     location: '',
     password: '',
   });
+
+  const fetchPartners = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/partners');
+      const json = await res.json();
+      if (json.success) {
+        setPartners(json.data);
+      } else {
+        showFeedback(json.error || 'Failed to fetch partners', 'error');
+      }
+    } catch (err) {
+      showFeedback('An error occurred while fetching partners', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchPartners();
+  }, []);
+
+  const showFeedback = (msg: string, severity: 'success' | 'error' = 'success') => {
+    setSnackbarMessage(msg);
+    setSnackbarSeverity(severity);
+    setOpenSnackbar(true);
+  };
 
   const handleOpen = (partner?: Partner) => {
     if (partner) {
@@ -100,12 +129,26 @@ export default function PartnersPage() {
     setOpen(true);
   };
 
-  const handleResetPassword = (partner: Partner) => {
+  const handleResetPassword = async (partner: Partner) => {
     const password = generateSecurePassword();
-    setResettingPartner(partner);
-    setNewPassword(password);
-    setShowPassword(true);
-    setResetDialogOpen(true);
+    try {
+      const res = await fetch('/api/partners', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: partner.id, password }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setResettingPartner(partner);
+        setNewPassword(password);
+        setShowPassword(true);
+        setResetDialogOpen(true);
+      } else {
+        showFeedback(json.error || 'Failed to reset password', 'error');
+      }
+    } catch (err) {
+      showFeedback('An error occurred while resetting password', 'error');
+    }
   };
 
   const handleClose = () => {
@@ -117,91 +160,148 @@ export default function PartnersPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingPartner) {
-      setPartners(partners.map(p => p.id === editingPartner.id ? { ...editingPartner, ...formData } : p));
-      setSnackbarMessage('Partner updated successfully');
-    } else {
-      const newPartner = {
-        id: partners.length + 1,
-        ...formData,
-      };
-      setPartners([...partners, newPartner]);
-      setSnackbarMessage(`Partner ${formData.partnerCode} added successfully`);
+    if (!formData.name.trim() || !formData.contactPerson.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.location.trim()) {
+      return;
     }
-    setOpenSnackbar(true);
-    handleClose();
+
+    try {
+      setSubmitting(true);
+      if (editingPartner) {
+        const res = await fetch('/api/partners', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingPartner.id, ...formData }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          setPartners(partners.map(p => p.id === editingPartner.id ? { ...editingPartner, ...formData } : p));
+          showFeedback('Partner updated successfully');
+          handleClose();
+        } else {
+          showFeedback(json.error || 'Failed to update partner', 'error');
+        }
+      } else {
+        const res = await fetch('/api/partners', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+        const json = await res.json();
+        if (json.success) {
+          setPartners([...partners, json.data]);
+          showFeedback(`Partner ${json.data.partnerCode} added successfully`);
+          handleClose();
+        } else {
+          showFeedback(json.error || 'Failed to add partner', 'error');
+        }
+      }
+    } catch (err) {
+      showFeedback('An error occurred during submission', 'error');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm('Are you sure you want to delete this partner?')) {
-      setPartners(partners.filter(p => p.id !== id));
+  const handleDelete = async (id: number, name: string) => {
+    if (!confirm(`Are you sure you want to delete partner "${name}"?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/partners?id=${id}`, {
+        method: 'DELETE',
+      });
+      const json = await res.json();
+      if (json.success) {
+        setPartners(partners.filter(p => p.id !== id));
+        showFeedback(`Partner "${name}" deleted successfully`);
+      } else {
+        showFeedback(json.error || 'Failed to delete partner', 'error');
+      }
+    } catch (err) {
+      showFeedback('An error occurred while deleting partner', 'error');
     }
   };
 
   return (
-    <Box>
+    <Box sx={{ width: '100%' }}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Partners Management</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpen()}>
+        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Partners Management</Typography>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpen()} sx={{ px: 3, py: 1, borderRadius: 2 }}>
           Add Partner
         </Button>
       </Stack>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="partners table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Code</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Location</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {partners.map((partner) => (
-              <TableRow key={partner.id}>
-                <TableCell>
-                  <Chip label={partner.partnerCode} color="primary" variant="outlined" size="small" />
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {partner.name}
-                </TableCell>
-                <TableCell>{partner.email}</TableCell>
-                <TableCell>{partner.phone}</TableCell>
-                <TableCell>{partner.location}</TableCell>
-                <TableCell align="right">
-                  <IconButton color="secondary" onClick={() => router.push(`/admin/partners/${partner.partnerCode}/branches?name=${encodeURIComponent(partner.name)}`)} title="Manage Branches">
-                    <StoreIcon />
-                  </IconButton>
-                  <IconButton color="warning" onClick={() => handleResetPassword(partner)} title="Reset Password">
-                    <LockResetIcon />
-                  </IconButton>
-                  <IconButton color="info" onClick={() => router.push(`/admin/partners/${partner.partnerCode}/staff?name=${encodeURIComponent(partner.name)}`)} title="Manage Staff">
-                    <BadgeIcon />
-                  </IconButton>
-                  <IconButton color="primary" onClick={() => handleOpen(partner)}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(partner.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+          <Table sx={{ minWidth: 650 }} aria-label="partners table">
+            <TableHead sx={{ backgroundColor: 'action.hover' }}>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Code</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Phone</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Location</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 'bold', pr: 4 }}>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {partners.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                    <Typography color="text.secondary">No partners found.</Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                partners.map((partner) => (
+                  <TableRow key={partner.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableCell>
+                      <Chip label={partner.partnerCode} color="primary" variant="outlined" size="small" sx={{ fontWeight: 'bold', borderRadius: 1 }} />
+                    </TableCell>
+                    <TableCell component="th" scope="row" sx={{ fontWeight: 500 }}>
+                      {partner.name}
+                    </TableCell>
+                    <TableCell>{partner.email}</TableCell>
+                    <TableCell>{partner.phone}</TableCell>
+                    <TableCell>{partner.location}</TableCell>
+                    <TableCell align="right" sx={{ pr: 3 }}>
+                      <IconButton color="secondary" onClick={() => router.push(`/admin/partners/${partner.partnerCode}/branches?name=${encodeURIComponent(partner.name)}`)} title="Manage Branches">
+                        <StoreIcon />
+                      </IconButton>
+                      <IconButton color="warning" onClick={() => handleResetPassword(partner)} title="Reset Password">
+                        <LockResetIcon />
+                      </IconButton>
+                      <IconButton color="info" onClick={() => router.push(`/admin/partners/${partner.partnerCode}/staff?name=${encodeURIComponent(partner.name)}`)} title="Manage Staff">
+                        <BadgeIcon />
+                      </IconButton>
+                      <IconButton color="primary" onClick={() => handleOpen(partner)} title="Edit Partner">
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton color="error" onClick={() => handleDelete(partner.id, partner.name)} title="Delete Partner">
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingPartner ? 'Edit Partner' : 'Add New Partner'}</DialogTitle>
+      {/* Add / Edit Partner Dialog */}
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth sx={{ '& .MuiDialog-paper': { borderRadius: 3 } }}>
+        <DialogTitle sx={{ fontWeight: 'bold', pb: 1 }}>{editingPartner ? 'Edit Partner' : 'Add New Partner'}</DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
-              <Typography variant="subtitle2" color="primary">Account Credentials</Typography>
+              <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 'bold' }}>Account Credentials</Typography>
               <Stack direction="row" spacing={2}>
                 <TextField
                   name="partnerCode"
@@ -220,7 +320,7 @@ export default function PartnersPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
-                  disabled={!!editingPartner}
+                  disabled={!!editingPartner || submitting}
                   slotProps={{
                     input: {
                       readOnly: !!editingPartner,
@@ -241,7 +341,7 @@ export default function PartnersPage() {
                 />
               </Stack>
               <Divider sx={{ my: 1 }} />
-              <Typography variant="subtitle2" color="primary">Partner Details</Typography>
+              <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 'bold' }}>Partner Details</Typography>
               <TextField
                 name="name"
                 label="Partner Name"
@@ -249,6 +349,7 @@ export default function PartnersPage() {
                 required
                 value={formData.name}
                 onChange={handleChange}
+                disabled={submitting}
               />
               <TextField
                 name="contactPerson"
@@ -257,6 +358,7 @@ export default function PartnersPage() {
                 required
                 value={formData.contactPerson}
                 onChange={handleChange}
+                disabled={submitting}
               />
               <TextField
                 name="email"
@@ -266,36 +368,42 @@ export default function PartnersPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
+                disabled={submitting}
               />
-              <TextField
-                name="phone"
-                label="Phone Number"
-                fullWidth
-                required
-                value={formData.phone}
-                onChange={handleChange}
-              />
-              <TextField
-                name="location"
-                label="Location"
-                fullWidth
-                required
-                value={formData.location}
-                onChange={handleChange}
-              />
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  name="phone"
+                  label="Phone Number"
+                  fullWidth
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                  disabled={submitting}
+                />
+                <TextField
+                  name="location"
+                  label="Location"
+                  fullWidth
+                  required
+                  value={formData.location}
+                  onChange={handleChange}
+                  disabled={submitting}
+                />
+              </Stack>
             </Stack>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit" variant="contained">
+          <DialogActions sx={{ px: 3, pb: 3 }}>
+            <Button onClick={handleClose} disabled={submitting}>Cancel</Button>
+            <Button type="submit" variant="contained" disabled={submitting}>
               {editingPartner ? 'Save Changes' : 'Add Partner'}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
 
-      <Dialog open={resetDialogOpen} onClose={handleClose} maxWidth="xs" fullWidth>
-        <DialogTitle>Reset Partner Password</DialogTitle>
+      {/* Password Reset Confirmation Dialog */}
+      <Dialog open={resetDialogOpen} onClose={handleClose} maxWidth="xs" fullWidth sx={{ '& .MuiDialog-paper': { borderRadius: 3 } }}>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Reset Partner Password</DialogTitle>
         <DialogContent>
           <Typography variant="body2" sx={{ mb: 2 }}>
             A new secure password has been generated for <strong>{resettingPartner?.name}</strong>.
@@ -324,19 +432,19 @@ export default function PartnersPage() {
             helperText="Please share this new password with the partner."
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
           <Button onClick={handleClose} variant="contained">Done</Button>
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar feedback notification */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+        <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%', borderRadius: 2 }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

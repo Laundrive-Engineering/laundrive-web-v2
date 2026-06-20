@@ -27,72 +27,74 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import BadgeIcon from '@mui/icons-material/Badge';
-import StoreIcon from '@mui/icons-material/Store';
 import LockResetIcon from '@mui/icons-material/LockReset';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { generatePartnerCode, generateSecurePassword } from '@/utils/generators';
-import { useRouter } from 'next/navigation';
+import { generateSecurePassword } from '@/utils/generators';
 
-interface Partner {
+interface Rider {
   id: number;
-  partnerCode: string;
+  riderCode: string;
   name: string;
-  contactPerson: string;
+  licenseNumber: string;
   email: string;
   phone: string;
-  location: string;
+  vehicle: string;
+  status: 'Active' | 'Inactive';
 }
 
-const initialPartners: Partner[] = [
-  { id: 1, partnerCode: 'QC-001', name: 'Quick Clean', contactPerson: 'John Doe', email: 'contact@quickclean.com', phone: '09123456789', location: 'Cebu City' },
-  { id: 2, partnerCode: 'LD-002', name: 'Laundry Day', contactPerson: 'Jane Smith', email: 'info@laundryday.ph', phone: '09987654321', location: 'Mandaue City' },
+const generateRiderCode = () => {
+  const random = Math.floor(1000 + Math.random() * 9000);
+  return `RDR-${random}`;
+};
+
+const initialRiders: Rider[] = [
+  { id: 1, riderCode: 'RDR-1024', name: 'Mike Johnson', licenseNumber: 'D01-23-456789', email: 'mike@example.com', phone: '09171234567', vehicle: 'Motorcycle', status: 'Active' },
 ];
 
-export default function PartnersPage() {
-  const [partners, setPartners] = React.useState<Partner[]>(initialPartners);
+export default function RidersPage() {
+  const [riders, setRiders] = React.useState<Rider[]>(initialRiders);
   const [open, setOpen] = React.useState(false);
   const [resetDialogOpen, setResetDialogOpen] = React.useState(false);
-  const [resettingPartner, setResettingPartner] = React.useState<Partner | null>(null);
+  const [resettingRider, setResettingRider] = React.useState<Rider | null>(null);
   const [newPassword, setNewPassword] = React.useState('');
-  const [editingPartner, setEditingPartner] = React.useState<Partner | null>(null);
+  const [editingRider, setEditingRider] = React.useState<Rider | null>(null);
   const [showPassword, setShowPassword] = React.useState(true);
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
-  const router = useRouter();
+  
   const [formData, setFormData] = React.useState({
-    partnerCode: '',
+    riderCode: '',
     name: '',
-    contactPerson: '',
+    licenseNumber: '',
     email: '',
     phone: '',
-    location: '',
+    vehicle: '',
     password: '',
   });
 
-  const handleOpen = (partner?: Partner) => {
-    if (partner) {
-      setEditingPartner(partner);
+  const handleOpen = (rider?: Rider) => {
+    if (rider) {
+      setEditingRider(rider);
       setFormData({
-        partnerCode: partner.partnerCode,
-        name: partner.name,
-        contactPerson: partner.contactPerson,
-        email: partner.email,
-        phone: partner.phone,
-        location: partner.location,
+        riderCode: rider.riderCode,
+        name: rider.name,
+        licenseNumber: rider.licenseNumber,
+        email: rider.email,
+        phone: rider.phone,
+        vehicle: rider.vehicle,
         password: '••••••••',
       });
       setShowPassword(false);
     } else {
-      setEditingPartner(null);
+      setEditingRider(null);
       setFormData({
-        partnerCode: generatePartnerCode(''),
+        riderCode: generateRiderCode(),
         name: '',
-        contactPerson: '',
+        licenseNumber: '',
         email: '',
         phone: '',
-        location: '',
+        vehicle: '',
         password: generateSecurePassword(),
       });
       setShowPassword(true);
@@ -100,9 +102,9 @@ export default function PartnersPage() {
     setOpen(true);
   };
 
-  const handleResetPassword = (partner: Partner) => {
+  const handleResetPassword = (rider: Rider) => {
     const password = generateSecurePassword();
-    setResettingPartner(partner);
+    setResettingRider(rider);
     setNewPassword(password);
     setShowPassword(true);
     setResetDialogOpen(true);
@@ -119,74 +121,77 @@ export default function PartnersPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingPartner) {
-      setPartners(partners.map(p => p.id === editingPartner.id ? { ...editingPartner, ...formData } : p));
-      setSnackbarMessage('Partner updated successfully');
+    if (editingRider) {
+      setRiders(riders.map(r => r.id === editingRider.id ? { ...editingRider, ...formData, status: editingRider.status } : r));
+      setSnackbarMessage('Rider updated successfully');
     } else {
-      const newPartner = {
-        id: partners.length + 1,
+      const newRider: Rider = {
+        id: riders.length + 1,
+        status: 'Active',
         ...formData,
       };
-      setPartners([...partners, newPartner]);
-      setSnackbarMessage(`Partner ${formData.partnerCode} added successfully`);
+      setRiders([...riders, newRider]);
+      setSnackbarMessage(`Rider ${formData.riderCode} added successfully`);
     }
     setOpenSnackbar(true);
     handleClose();
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Are you sure you want to delete this partner?')) {
-      setPartners(partners.filter(p => p.id !== id));
+    if (confirm('Are you sure you want to delete this rider?')) {
+      setRiders(riders.filter(r => r.id !== id));
     }
   };
 
   return (
     <Box>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Partners Management</Typography>
+        <Typography variant="h4">Rider Management</Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpen()}>
-          Add Partner
+          Add Rider
         </Button>
       </Stack>
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="partners table">
+        <Table sx={{ minWidth: 650 }} aria-label="riders table">
           <TableHead>
             <TableRow>
               <TableCell>Code</TableCell>
               <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Location</TableCell>
+              <TableCell>Contact</TableCell>
+              <TableCell>License / Vehicle</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {partners.map((partner) => (
-              <TableRow key={partner.id}>
+            {riders.map((rider) => (
+              <TableRow key={rider.id}>
                 <TableCell>
-                  <Chip label={partner.partnerCode} color="primary" variant="outlined" size="small" />
+                  <Chip label={rider.riderCode} color="primary" variant="outlined" size="small" />
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  {partner.name}
+                  {rider.name}
                 </TableCell>
-                <TableCell>{partner.email}</TableCell>
-                <TableCell>{partner.phone}</TableCell>
-                <TableCell>{partner.location}</TableCell>
+                <TableCell>
+                  <Typography variant="body2">{rider.email}</Typography>
+                  <Typography variant="caption" color="text.secondary">{rider.phone}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2">{rider.licenseNumber}</Typography>
+                  <Typography variant="caption" color="text.secondary">{rider.vehicle}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Chip label={rider.status} color={rider.status === 'Active' ? 'success' : 'default'} size="small" />
+                </TableCell>
                 <TableCell align="right">
-                  <IconButton color="secondary" onClick={() => router.push(`/admin/partners/${partner.partnerCode}/branches?name=${encodeURIComponent(partner.name)}`)} title="Manage Branches">
-                    <StoreIcon />
-                  </IconButton>
-                  <IconButton color="warning" onClick={() => handleResetPassword(partner)} title="Reset Password">
+                  <IconButton color="warning" onClick={() => handleResetPassword(rider)} title="Reset Password">
                     <LockResetIcon />
                   </IconButton>
-                  <IconButton color="info" onClick={() => router.push(`/admin/partners/${partner.partnerCode}/staff?name=${encodeURIComponent(partner.name)}`)} title="Manage Staff">
-                    <BadgeIcon />
-                  </IconButton>
-                  <IconButton color="primary" onClick={() => handleOpen(partner)}>
+                  <IconButton color="primary" onClick={() => handleOpen(rider)}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(partner.id)}>
+                  <IconButton color="error" onClick={() => handleDelete(rider.id)}>
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -197,20 +202,18 @@ export default function PartnersPage() {
       </TableContainer>
 
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingPartner ? 'Edit Partner' : 'Add New Partner'}</DialogTitle>
+        <DialogTitle>{editingRider ? 'Edit Rider' : 'Add New Rider'}</DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
               <Typography variant="subtitle2" color="primary">Account Credentials</Typography>
               <Stack direction="row" spacing={2}>
                 <TextField
-                  name="partnerCode"
+                  name="riderCode"
                   label="Generated Username"
                   fullWidth
-                  value={formData.partnerCode}
-                  slotProps={{
-                    input: { readOnly: true },
-                  }}
+                  value={formData.riderCode}
+                  slotProps={{ input: { readOnly: true } }}
                   helperText="Unique login identifier"
                 />
                 <TextField
@@ -220,11 +223,11 @@ export default function PartnersPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
-                  disabled={!!editingPartner}
+                  disabled={!!editingRider}
                   slotProps={{
                     input: {
-                      readOnly: !!editingPartner,
-                      endAdornment: !editingPartner && (
+                      readOnly: !!editingRider,
+                      endAdornment: !editingRider && (
                         <InputAdornment position="end">
                           <IconButton
                             aria-label="toggle password visibility"
@@ -237,68 +240,73 @@ export default function PartnersPage() {
                       ),
                     },
                   }}
-                  helperText={editingPartner ? "Password cannot be viewed here" : "Secure auto-generated password"}
+                  helperText={editingRider ? "Password cannot be viewed here" : "Secure auto-generated password"}
                 />
               </Stack>
               <Divider sx={{ my: 1 }} />
-              <Typography variant="subtitle2" color="primary">Partner Details</Typography>
+              <Typography variant="subtitle2" color="primary">Rider Details</Typography>
               <TextField
                 name="name"
-                label="Partner Name"
+                label="Full Name"
                 fullWidth
                 required
                 value={formData.name}
                 onChange={handleChange}
               />
-              <TextField
-                name="contactPerson"
-                label="Contact Person"
-                fullWidth
-                required
-                value={formData.contactPerson}
-                onChange={handleChange}
-              />
-              <TextField
-                name="email"
-                label="Email Address"
-                type="email"
-                fullWidth
-                required
-                value={formData.email}
-                onChange={handleChange}
-              />
-              <TextField
-                name="phone"
-                label="Phone Number"
-                fullWidth
-                required
-                value={formData.phone}
-                onChange={handleChange}
-              />
-              <TextField
-                name="location"
-                label="Location"
-                fullWidth
-                required
-                value={formData.location}
-                onChange={handleChange}
-              />
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  name="email"
+                  label="Email Address"
+                  type="email"
+                  fullWidth
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                <TextField
+                  name="phone"
+                  label="Phone Number"
+                  fullWidth
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </Stack>
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  name="licenseNumber"
+                  label="Driver License Number"
+                  fullWidth
+                  required
+                  value={formData.licenseNumber}
+                  onChange={handleChange}
+                />
+                <TextField
+                  name="vehicle"
+                  label="Vehicle Type"
+                  fullWidth
+                  required
+                  value={formData.vehicle}
+                  onChange={handleChange}
+                  placeholder="e.g., Motorcycle, Van"
+                />
+              </Stack>
             </Stack>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
             <Button type="submit" variant="contained">
-              {editingPartner ? 'Save Changes' : 'Add Partner'}
+              {editingRider ? 'Save Changes' : 'Add Rider'}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
 
       <Dialog open={resetDialogOpen} onClose={handleClose} maxWidth="xs" fullWidth>
-        <DialogTitle>Reset Partner Password</DialogTitle>
+        <DialogTitle>Reset Rider Password</DialogTitle>
         <DialogContent>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            A new secure password has been generated for <strong>{resettingPartner?.name}</strong>.
+            A new secure password has been generated for <strong>{resettingRider?.name}</strong>.
           </Typography>
           <TextField
             label="New Secure Password"
@@ -321,7 +329,7 @@ export default function PartnersPage() {
                 ),
               },
             }}
-            helperText="Please share this new password with the partner."
+            helperText="Please share this new password with the rider."
           />
         </DialogContent>
         <DialogActions>

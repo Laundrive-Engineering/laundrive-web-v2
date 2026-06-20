@@ -27,6 +27,8 @@ export interface Partner {
   location: string;
   password?: string;
   thumbnail?: string;
+  logo?: string;
+  banner?: string;
   services?: Service[];
   branches?: Branch[];
 }
@@ -52,6 +54,8 @@ function ensureDb() {
         location: "Cebu City",
         password: "password123",
         thumbnail: "/images/partners/quick_clean_thumbnail.png",
+        logo: "/images/partners/quick_clean_thumbnail.png",
+        banner: "/images/partners/quick_clean_banner.png",
         services: [
           { id: "SRV-001", name: "Wash, Dry & Fold", price: 150.00, unit: "per kg" },
           { id: "SRV-002", name: "Premium Detergent", price: 25.00, unit: "per sachet" },
@@ -72,6 +76,8 @@ function ensureDb() {
         location: "Mandaue City",
         password: "password123",
         thumbnail: "/images/partners/laundry_day_thumbnail.png",
+        logo: "/images/partners/laundry_day_thumbnail.png",
+        banner: "/images/partners/laundry_day_banner.png",
         services: [
           { id: "SRV-004", name: "Dry Cleaning (Suit)", price: 450.00, unit: "per set" },
           { id: "SRV-005", name: "Ironing Only", price: 80.00, unit: "per kg" }

@@ -57,8 +57,8 @@ describe('Partner Uploads TDD Test Suite', () => {
 
       const req = new Request('http://localhost/api/partners/upload', {
         method: 'POST',
-        body: formData,
       });
+      req.formData = async () => formData;
 
       const response = await uploadHandler(req);
       expect(response.status).toBe(200);
@@ -81,8 +81,8 @@ describe('Partner Uploads TDD Test Suite', () => {
 
       const req = new Request('http://localhost/api/partners/upload', {
         method: 'POST',
-        body: formData,
       });
+      req.formData = async () => formData;
 
       const response = await uploadHandler(req);
       expect(response.status).toBe(400);

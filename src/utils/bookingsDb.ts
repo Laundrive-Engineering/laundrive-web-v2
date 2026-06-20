@@ -5,6 +5,7 @@ export interface Booking {
   id: string;
   customerId: string;
   partnerCode: string;
+  branchName?: string;
   service: string;
   status: 'Pending' | 'Picked Up' | 'In Laundry' | 'Delivering' | 'Completed';
   total: number;

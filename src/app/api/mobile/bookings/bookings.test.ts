@@ -26,6 +26,7 @@ describe('Booking Mobile API TDD Test Suite', () => {
         body: JSON.stringify({
           customerId: 'CUST-001',
           partnerCode: 'QC-001',
+          branchName: 'IT Park Branch',
           service: 'Wash & Fold',
           total: 350.00
         }),
@@ -38,6 +39,7 @@ describe('Booking Mobile API TDD Test Suite', () => {
       expect(json.data.id).toBeDefined();
       expect(json.data.customerId).toBe('CUST-001');
       expect(json.data.partnerCode).toBe('QC-001');
+      expect(json.data.branchName).toBe('IT Park Branch');
       expect(json.data.service).toBe('Wash & Fold');
       expect(json.data.total).toBe(350.00);
       expect(json.data.status).toBe('Pending');

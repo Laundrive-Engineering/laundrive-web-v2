@@ -42,6 +42,7 @@ export async function POST(request: Request) {
     const newBooking = addBooking({
       customerId: body.customerId,
       partnerCode: body.partnerCode,
+      branchName: body.branchName,
       service: body.service,
       total: Number(body.total),
     });

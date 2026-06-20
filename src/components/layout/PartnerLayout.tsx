@@ -45,7 +45,15 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 
 export default function PartnerLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
+  const [partnerName, setPartnerName] = React.useState('Laundrive Partner');
   const router = useRouter();
+
+  React.useEffect(() => {
+    const storedName = localStorage.getItem('partner-name');
+    if (storedName) {
+      setPartnerName(storedName);
+    }
+  }, []);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -78,7 +86,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Laundrive Partner
+            {partnerName}
           </Typography>
           <IconButton color="inherit" onClick={handleLogout}>
             <LogoutIcon />

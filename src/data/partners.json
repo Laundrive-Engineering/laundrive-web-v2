@@ -1,4 +1,99 @@
 [
-  { "id": 1, "partnerCode": "QC-001", "name": "Quick Clean", "contactPerson": "John Doe", "email": "contact@quickclean.com", "phone": "09123456789", "location": "Cebu City", "password": "password123" },
-  { "id": 2, "partnerCode": "LD-002", "name": "Laundry Day", "contactPerson": "Jane Smith", "email": "info@laundryday.ph", "phone": "09987654321", "location": "Mandaue City", "password": "password123" }
+  {
+    "id": 1,
+    "partnerCode": "QC-001",
+    "name": "Quick Clean",
+    "contactPerson": "John Doe",
+    "email": "contact@quickclean.com",
+    "phone": "09123456789",
+    "location": "Cebu City",
+    "password": "password123",
+    "thumbnail": "/images/partners/quick_clean_thumbnail.png",
+    "logo": "/images/partners/quick_clean_thumbnail.png",
+    "banner": "/images/partners/quick_clean_banner.png",
+    "services": [
+      {
+        "id": "SRV-001",
+        "name": "Wash, Dry & Fold",
+        "price": 150,
+        "unit": "per kg"
+      },
+      {
+        "id": "SRV-002",
+        "name": "Premium Detergent",
+        "price": 25,
+        "unit": "per sachet"
+      },
+      {
+        "id": "SRV-003",
+        "name": "Fabric Conditioner",
+        "price": 20,
+        "unit": "per sachet"
+      }
+    ],
+    "branches": [
+      {
+        "id": "BR-001",
+        "name": "IT Park Branch",
+        "address": "IT Park, Cebu City",
+        "phone": "09123456789",
+        "operatingHours": "8:00 AM - 5:00 PM",
+        "offeredServices": [
+          "SRV-001",
+          "SRV-002",
+          "SRV-003"
+        ]
+      },
+      {
+        "id": "BR-002",
+        "name": "Banilad Branch",
+        "address": "Banilad, Cebu City",
+        "phone": "09123456780",
+        "operatingHours": "9:00 AM - 6:00 PM",
+        "offeredServices": [
+          "SRV-001"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "partnerCode": "LD-002",
+    "name": "Laundry Day",
+    "contactPerson": "Jane Smith",
+    "email": "info@laundryday.ph",
+    "phone": "09987654321",
+    "location": "Mandaue City",
+    "password": "password123",
+    "thumbnail": "/images/partners/laundry_day_thumbnail.png",
+    "logo": "/images/partners/laundry_day_thumbnail.png",
+    "banner": "/images/partners/laundry_day_banner.png",
+    "services": [
+      {
+        "id": "SRV-004",
+        "name": "Dry Cleaning (Suit)",
+        "price": 450,
+        "unit": "per set"
+      },
+      {
+        "id": "SRV-005",
+        "name": "Ironing Only",
+        "price": 80,
+        "unit": "per kg"
+      }
+    ],
+    "branches": [
+      {
+        "id": "BR-003",
+        "name": "Mandaue Branch",
+        "address": "Mandaue City, Cebu",
+        "phone": "09987654321",
+        "operatingHours": "8:00 AM - 8:00 PM",
+        "offeredServices": [
+          "SRV-004",
+          "SRV-005"
+        ]
+      }
+    ]
+  }
 ]

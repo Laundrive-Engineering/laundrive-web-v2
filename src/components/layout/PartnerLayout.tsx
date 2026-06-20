@@ -17,6 +17,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
+import StoreIcon from '@mui/icons-material/Store';
+import LocalLaundryServiceIcon from '@mui/icons-material/LocalLaundryService';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -56,6 +58,8 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/partner' },
     { text: 'Orders', icon: <ShoppingCartIcon />, href: '/partner/orders' },
+    { text: 'Services', icon: <LocalLaundryServiceIcon />, href: '/partner/services' },
+    { text: 'Branches', icon: <StoreIcon />, href: '/partner/branches' },
     { text: 'Staff', icon: <AccountCircleIcon />, href: '/partner/staff' },
     { text: 'Profile', icon: <AccountCircleIcon />, href: '/partner/profile' },
   ];

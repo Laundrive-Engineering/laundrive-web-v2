@@ -1,0 +1,17 @@
+[
+  {
+    "id": "LOC-001",
+    "name": "Cebu City",
+    "active": true
+  },
+  {
+    "id": "LOC-002",
+    "name": "Mandaue City",
+    "active": true
+  },
+  {
+    "id": "LOC-003",
+    "name": "LapuLapu City",
+    "active": true
+  }
+]

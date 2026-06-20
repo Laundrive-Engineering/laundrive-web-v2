@@ -19,6 +19,10 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import PlaceIcon from '@mui/icons-material/Place';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -63,7 +67,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/admin' },
+    { text: 'Bookings', icon: <ReceiptLongIcon />, href: '/admin/bookings' },
     { text: 'Partners', icon: <PeopleIcon />, href: '/admin/partners' },
+    { text: 'Riders', icon: <DirectionsBikeIcon />, href: '/admin/riders' },
+    { text: 'Customers', icon: <AccountBoxIcon />, href: '/admin/customers' },
+    { text: 'Locations', icon: <PlaceIcon />, href: '/admin/locations' },
     { text: 'Users', icon: <PeopleIcon />, href: '/admin/users', superOnly: true },
     { text: 'Settings', icon: <SettingsIcon />, href: '/admin/settings', superOnly: true },
   ];

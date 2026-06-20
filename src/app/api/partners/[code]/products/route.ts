@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getPartners } from '../../../../../utils/partnersDb';
 
 export async function GET(
   request: Request,
@@ -6,20 +7,22 @@ export async function GET(
 ) {
   const { code: partnerCode } = await params;
   
-  // Mock data mapping based on partner code
-  const productCatalog: Record<string, any[]> = {
-    'QC-001': [
-      { id: 'PRD-1', name: 'Wash, Dry & Fold', price: 150.00, unit: 'per kg', category: 'Service' },
-      { id: 'PRD-2', name: 'Premium Detergent', price: 25.00, unit: 'per sachet', category: 'Add-on' },
-      { id: 'PRD-3', name: 'Fabric Conditioner', price: 20.00, unit: 'per sachet', category: 'Add-on' },
-    ],
-    'LD-002': [
-      { id: 'PRD-4', name: 'Dry Cleaning (Suit)', price: 450.00, unit: 'per set', category: 'Service' },
-      { id: 'PRD-5', name: 'Ironing Only', price: 80.00, unit: 'per kg', category: 'Service' },
-    ]
-  };
+  const partners = getPartners();
+  const partner = partners.find(
+    (p) => p.partnerCode.toLowerCase() === partnerCode.toLowerCase()
+  );
 
-  const products = productCatalog[partnerCode] || [];
+  if (!partner) {
+    return NextResponse.json({ success: false, error: 'Partner or products not found' }, { status: 404 });
+  }
+
+  const products = (partner.services || []).map(s => ({
+    id: s.id,
+    name: s.name,
+    price: s.price,
+    unit: s.unit,
+    category: s.name.toLowerCase().includes('detergent') || s.name.toLowerCase().includes('conditioner') ? 'Add-on' : 'Service'
+  }));
 
   if (products.length === 0) {
     return NextResponse.json({ success: false, error: 'Partner or products not found' }, { status: 404 });

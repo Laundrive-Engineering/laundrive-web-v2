@@ -1,0 +1,43 @@
+[
+  {
+    "id": "a1b2c3d4e5f67890",
+    "customerId": "CUST-001",
+    "partnerCode": "QC-001",
+    "service": "Wash & Fold",
+    "status": "In Laundry",
+    "total": 350,
+    "bookingDate": "2024-06-20"
+  },
+  {
+    "id": "0987654321fedcba",
+    "customerId": "CUST-002",
+    "partnerCode": "LD-002",
+    "service": "Dry Cleaning",
+    "status": "Picked Up",
+    "total": 600,
+    "bookingDate": "2024-06-20",
+    "riderCode": "RDR-1024"
+  },
+  {
+    "id": "061068d5a774b830",
+    "status": "Completed",
+    "bookingDate": "2026-06-20",
+    "customerId": "CUST-003",
+    "partnerCode": "QC-001",
+    "branchName": "IT Park Branch",
+    "service": "Wash, Dry & Fold",
+    "total": 450,
+    "riderCode": "RDR-1024"
+  },
+  {
+    "id": "1128a2149717269e",
+    "status": "In Laundry",
+    "bookingDate": "2026-06-20",
+    "customerId": "CUST-003",
+    "partnerCode": "QC-001",
+    "branchName": "Banilad Branch",
+    "service": "Wash, Dry & Fold",
+    "total": 150,
+    "riderCode": "RDR-1024"
+  }
+]

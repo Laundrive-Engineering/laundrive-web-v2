@@ -17,6 +17,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
+import StoreIcon from '@mui/icons-material/Store';
+import LocalLaundryServiceIcon from '@mui/icons-material/LocalLaundryService';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -43,7 +45,15 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 
 export default function PartnerLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
+  const [partnerName, setPartnerName] = React.useState('Laundrive Partner');
   const router = useRouter();
+
+  React.useEffect(() => {
+    const storedName = localStorage.getItem('partner-name');
+    if (storedName) {
+      setPartnerName(storedName);
+    }
+  }, []);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -56,6 +66,8 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/partner' },
     { text: 'Orders', icon: <ShoppingCartIcon />, href: '/partner/orders' },
+    { text: 'Services', icon: <LocalLaundryServiceIcon />, href: '/partner/services' },
+    { text: 'Branches', icon: <StoreIcon />, href: '/partner/branches' },
     { text: 'Staff', icon: <AccountCircleIcon />, href: '/partner/staff' },
     { text: 'Profile', icon: <AccountCircleIcon />, href: '/partner/profile' },
   ];
@@ -74,7 +86,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Laundrive Partner
+            {partnerName}
           </Typography>
           <IconButton color="inherit" onClick={handleLogout}>
             <LogoutIcon />

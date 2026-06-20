@@ -1,4 +1,32 @@
 [
-  { "id": "CUST-001", "name": "Alice Green", "email": "alice@example.com", "phone": "09123456780", "address": "IT Park, Cebu", "joinDate": "2024-01-15", "status": "Active", "password": "password123" },
-  { "id": "CUST-002", "name": "Bob White", "email": "bob@example.com", "phone": "09987654320", "address": "Banilad, Mandaue", "joinDate": "2024-03-22", "status": "Active", "password": "password123" }
+  {
+    "id": "CUST-001",
+    "name": "Alice Green",
+    "email": "alice@example.com",
+    "phone": "09123456780",
+    "address": "IT Park, Cebu",
+    "joinDate": "2024-01-15",
+    "status": "Active",
+    "password": "password123"
+  },
+  {
+    "id": "CUST-002",
+    "name": "Bob White",
+    "email": "bob@example.com",
+    "phone": "09987654320",
+    "address": "Banilad, Mandaue",
+    "joinDate": "2024-03-22",
+    "status": "Active",
+    "password": "password123"
+  },
+  {
+    "id": "CUST-003",
+    "joinDate": "2026-06-20",
+    "status": "Active",
+    "name": "Kyle Emmanuel Domingo",
+    "email": "ke.domingz@gmail.com",
+    "phone": "+639179710556",
+    "address": "Mivesa Garden Residences, Lahug, Cebu City",
+    "password": "d0mingo123!!!"
+  }
 ]

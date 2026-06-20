@@ -1,11 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 export interface Booking {
   id: string;
   customerId: string;
   partnerCode: string;
   branchName?: string;
+  riderCode?: string;
   service: string;
   status: 'Pending' | 'Picked Up' | 'In Laundry' | 'Delivering' | 'Completed';
   total: number;
@@ -23,8 +25,8 @@ function ensureDb() {
   }
   if (!fs.existsSync(filePath)) {
     fs.writeFileSync(filePath, JSON.stringify([
-      { id: 'BKG-001', customerId: 'CUST-001', partnerCode: 'QC-001', service: 'Wash & Fold', status: 'In Laundry', total: 350.00, bookingDate: '2024-06-20' },
-      { id: 'BKG-002', customerId: 'CUST-002', partnerCode: 'LD-002', service: 'Dry Cleaning', status: 'Pending', total: 600.00, bookingDate: '2024-06-20' },
+      { id: 'a1b2c3d4e5f67890', customerId: 'CUST-001', partnerCode: 'QC-001', service: 'Wash & Fold', status: 'In Laundry', total: 350.00, bookingDate: '2024-06-20' },
+      { id: '0987654321fedcba', customerId: 'CUST-002', partnerCode: 'LD-002', service: 'Dry Cleaning', status: 'Pending', total: 600.00, bookingDate: '2024-06-20' },
     ], null, 2));
   }
 }
@@ -35,21 +37,23 @@ export function getBookings(): Booking[] {
   return JSON.parse(fileContent);
 }
 
+import { EventEmitter } from 'events';
+
+export const bookingEvents = new EventEmitter();
+bookingEvents.setMaxListeners(100);
+
 export function saveBookings(bookings: Booking[]) {
   ensureDb();
   fs.writeFileSync(filePath, JSON.stringify(bookings, null, 2));
+  bookingEvents.emit('changed');
 }
 
 export function addBooking(data: Omit<Booking, 'id' | 'status' | 'bookingDate'>): Booking {
   const bookings = getBookings();
-  const maxId = bookings.reduce((max, b) => {
-    const parsed = parseInt(b.id.replace('BKG-', ''), 10);
-    const num = isNaN(parsed) ? 0 : parsed;
-    return num > max ? num : max;
-  }, 0);
+  const newId = crypto.randomBytes(8).toString('hex');
 
   const newBooking: Booking = {
-    id: `BKG-${String(maxId + 1).padStart(3, '0')}`,
+    id: newId,
     status: 'Pending',
     bookingDate: new Date().toISOString().split('T')[0],
     ...data,
@@ -65,6 +69,15 @@ export function updateBookingStatus(id: string, status: Booking['status']): bool
   const idx = bookings.findIndex(b => b.id === id);
   if (idx === -1) return false;
   bookings[idx].status = status;
+  saveBookings(bookings);
+  return true;
+}
+
+export function updateBooking(id: string, updates: Partial<Booking>): boolean {
+  const bookings = getBookings();
+  const idx = bookings.findIndex(b => b.id === id);
+  if (idx === -1) return false;
+  bookings[idx] = { ...bookings[idx], ...updates };
   saveBookings(bookings);
   return true;
 }

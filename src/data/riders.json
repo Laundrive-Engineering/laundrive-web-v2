@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "riderCode": "RDR-1024",
+    "name": "Mike Johnson",
+    "licenseNumber": "D01-23-456789",
+    "email": "mike@example.com",
+    "phone": "09171234567",
+    "vehicle": "Motorcycle",
+    "status": "Active",
+    "password": "password123"
+  }
+]
